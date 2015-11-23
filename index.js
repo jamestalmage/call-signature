@@ -12,7 +12,7 @@ module.exports.generate = generate;
 //    https://github.com/mathiasbynens/regenerate
 //    https://www.npmjs.com/package/regjsgen
 
-var regex = /^\s*([A-Za-z$_][A-Za-z0-9$_]*)\s*\.\s*([A-Za-z$_][A-Za-z0-9$_]*)\s*\(\s*((?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*]))?((?:\s*,\s*(?:(?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*])))+)?\s*\)\s*$/;
+var regex = /^\s*(?:([A-Za-z$_][A-Za-z0-9$_]*)\s*\.)?\s*([A-Za-z$_][A-Za-z0-9$_]*)\s*\(\s*((?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*]))?((?:\s*,\s*(?:(?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*])))+)?\s*\)\s*$/;
 
 function parse(str) {
 	var match = regex.exec(str);
@@ -44,22 +44,39 @@ function parse(str) {
 		});
 	});
 
+	var callee;
+	if (object) {
+		callee = {
+			object: object,
+			member: member
+		};
+	} else {
+		callee = {
+			identifier: member
+		};
+	}
 	return {
-		object: object,
-		member: member,
+		callee: callee,
 		args: trimmed
 	};
 }
 
 function generate(parsed) {
-	return [
-		parsed.object,
-		'.',
-		parsed.member,
+	var callee;
+	if (parsed.callee.object) {
+		callee = [
+			parsed.callee.object,
+			'.',
+			parsed.callee.member
+		];
+	} else {
+		callee = [parsed.callee.identifier];
+	}
+	return callee.concat([
 		'(',
 		parsed.args.map(function (arg) {
 			return arg.optional ? '[' + arg.name + ']' : arg.name;
 		}).join(', '),
 		')'
-	].join('');
+	]).join('');
 }
