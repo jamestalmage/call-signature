@@ -20,8 +20,18 @@ function parse(str) {
 		return null;
 	}
 
-	var object = match[1];
-	var member = match[2];
+	var callee;
+	if (match[1]) {
+		callee = {
+			object: match[1],
+			member: match[2]
+		};
+	} else {
+		callee = {
+			identifier: match[2]
+		};
+	}
+
 	var args = match[4] || '';
 	args = args.split(',');
 	if (match[3]) {
@@ -44,17 +54,6 @@ function parse(str) {
 		});
 	});
 
-	var callee;
-	if (object) {
-		callee = {
-			object: object,
-			member: member
-		};
-	} else {
-		callee = {
-			identifier: member
-		};
-	}
 	return {
 		callee: callee,
 		args: trimmed
