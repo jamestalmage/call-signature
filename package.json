@@ -1,6 +1,6 @@
 {
   "name": "call-signature",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Parse / Generate Method Signatures",
   "license": "MIT",
   "repository": "jamestalmage/call-signature",
