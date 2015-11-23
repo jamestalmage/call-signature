@@ -4,6 +4,7 @@ import support from './';
 test('parse - handles spaces', t => {
 	const expected = {
 		callee: {
+			type: 'MemberExpression',
 			object: 't',
 			member: 'equal'
 		},
@@ -31,7 +32,8 @@ test('parse - handles spaces', t => {
 test('parse - when callee is an Identifier', t => {
 	const expected = {
 		callee: {
-			identifier: 'assert'
+			type: 'Identifier',
+			name: 'assert'
 		},
 		args: [
 			{
@@ -53,6 +55,7 @@ test('parse - when callee is an Identifier', t => {
 test('parse - handles no args', t => {
 	const expected = {
 		callee: {
+			type: 'MemberExpression',
 			object: 'a',
 			member: 'fail'
 		},
@@ -66,6 +69,7 @@ test('parse - handles no args', t => {
 test('parse - handles only optional args', t => {
 	const expected1 = {
 		callee: {
+			type: 'MemberExpression',
 			object: 'assert',
 			member: 'baz'
 		},
@@ -79,6 +83,7 @@ test('parse - handles only optional args', t => {
 
 	const expected2 = {
 		callee: {
+			type: 'MemberExpression',
 			object: 'assert',
 			member: 'baz'
 		},
@@ -104,6 +109,7 @@ test('parse - handles only optional args', t => {
 test('generate - MemberExpression callee', t => {
 	const parsed = {
 		callee: {
+			type: 'MemberExpression',
 			object: 't',
 			member: 'equal'
 		},
@@ -130,7 +136,8 @@ test('generate - MemberExpression callee', t => {
 test('generate - Identifier callee', t => {
 	const parsed = {
 		callee: {
-			identifier: 'assert'
+			type: 'Identifier',
+			name: 'assert'
 		},
 		args: [
 			{

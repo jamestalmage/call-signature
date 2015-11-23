@@ -23,12 +23,14 @@ function parse(str) {
 	var callee;
 	if (match[1]) {
 		callee = {
+			type: 'MemberExpression',
 			object: match[1],
 			member: match[2]
 		};
 	} else {
 		callee = {
-			identifier: match[2]
+			type: 'Identifier',
+			name: match[2]
 		};
 	}
 
@@ -62,14 +64,14 @@ function parse(str) {
 
 function generate(parsed) {
 	var callee;
-	if (parsed.callee.object) {
+	if (parsed.callee.type === 'MemberExpression') {
 		callee = [
 			parsed.callee.object,
 			'.',
 			parsed.callee.member
 		];
 	} else {
-		callee = [parsed.callee.identifier];
+		callee = [parsed.callee.name];
 	}
 	return callee.concat([
 		'(',
