@@ -20,10 +20,17 @@ test('parse - handles spaces', t => {
 			}
 		]
 	};
-	t.same(support.parse('t.equal(actual,expected,[message])'), expected, 'no spaces');
-	t.same(support.parse('t.equal(actual, expected, [message])'), expected, 'standard spacing');
-	t.same(support.parse('  t  .  equal  (  actual  ,  expected  ,  [  message  ]  )  '), expected, 'lots of spaces');
-	t.end();
+	t.deepEqual(support.parse('t.equal(actual,expected,[message])'), expected, 'no spaces');
+	t.deepEqual(
+        support.parse('t.equal(actual, expected, [message])'),
+        expected,
+        'standard spacing'
+    );
+	t.deepEqual(
+        support.parse('  t  .  equal  (  actual  ,  expected  ,  [  message  ]  )  '),
+        expected,
+        'lots of spaces'
+    );
 });
 
 test('parse - handles no args', t => {
@@ -32,9 +39,8 @@ test('parse - handles no args', t => {
 		member: 'fail',
 		args: []
 	};
-	t.same(support.parse('a.fail()'), expected, 'no spaces');
-	t.same(support.parse('  a  .  fail  (  )  '), expected, 'lots of spaces');
-	t.end();
+	t.deepEqual(support.parse('a.fail()'), expected, 'no spaces');
+	t.deepEqual(support.parse('  a  .  fail  (  )  '), expected, 'lots of spaces');
 });
 
 test('parse - handles only optional args', t => {
@@ -64,11 +70,18 @@ test('parse - handles only optional args', t => {
 		]
 	};
 
-	t.same(support.parse('assert.baz([foo])'), expected1, '1 arg - no spaces');
-	t.same(support.parse(' assert . baz ( [ foo ] ) '), expected1, '1 arg - lots of spaces');
-	t.same(support.parse('assert.baz([foo],[bar])'), expected2, '2 args - no spaces');
-	t.same(support.parse(' assert . baz ( [ foo ] , [ bar ] ) '), expected2, '2 args - lots of spaces');
-	t.end();
+	t.deepEqual(support.parse('assert.baz([foo])'), expected1, '1 arg - no spaces');
+	t.deepEqual(
+        support.parse(' assert . baz ( [ foo ] ) '),
+        expected1,
+        '1 arg - lots of spaces'
+    );
+	t.deepEqual(support.parse('assert.baz([foo],[bar])'), expected2, '2 args - no spaces');
+	t.deepEqual(
+        support.parse(' assert . baz ( [ foo ] , [ bar ] ) '),
+        expected2,
+        '2 args - lots of spaces'
+    );
 });
 
 test('generate', t => {
@@ -92,7 +105,6 @@ test('generate', t => {
 	};
 
 	t.is(support.generate(parsed), 't.equal(actual, expected, [message])');
-	t.end();
 });
 
 test('parse->generate round trip', t => {
@@ -112,5 +124,4 @@ test('parse->generate round trip', t => {
 			pattern
 		);
 	});
-	t.end();
 });
