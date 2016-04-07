@@ -53,10 +53,13 @@ test('parse - when callee is an Identifier', t => {
 			}
 		]
 	};
-	t.same(support.parse('assert(value,[message])'), expected, 'no spaces');
-	t.same(support.parse('assert(value, [message])'), expected, 'standard spacing');
-	t.same(support.parse('  assert  (  value  ,  [  message  ]  )  '), expected, 'lots of spaces');
-	t.end();
+	t.deepEqual(support.parse('assert(value,[message])'), expected, 'no spaces');
+	t.deepEqual(support.parse('assert(value, [message])'), expected, 'standard spacing');
+	t.deepEqual(
+        support.parse('  assert  (  value  ,  [  message  ]  )  '),
+        expected,
+        'lots of spaces'
+    );
 });
 
 test('parse - handles no args', t => {
@@ -164,7 +167,6 @@ test('generate - Identifier callee', t => {
 	};
 
 	t.is(support.generate(parsed), 'assert(value, [message])');
-	t.end();
 });
 
 test('parse->generate round trip', t => {
