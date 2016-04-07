@@ -12,7 +12,7 @@ module.exports.generate = generate;
 //    https://github.com/mathiasbynens/regenerate
 //    https://www.npmjs.com/package/regjsgen
 
-var regex = /^\s*([A-Za-z$_][A-Za-z0-9$_]*)\s*\.\s*([A-Za-z$_][A-Za-z0-9$_]*)\s*\(\s*((?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*]))?((?:\s*,\s*(?:(?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*])))+)?\s*\)\s*$/;
+var regex = /^\s*(?:([A-Za-z$_][A-Za-z0-9$_]*)\s*\.)?\s*([A-Za-z$_][A-Za-z0-9$_]*)\s*\(\s*((?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*]))?((?:\s*,\s*(?:(?:[A-Za-z$_][A-Za-z0-9$_]*)|(?:\[\s*[A-Za-z$_][A-Za-z0-9$_]*\s*])))+)?\s*\)\s*$/;
 
 function parse(str) {
 	var match = regex.exec(str);
@@ -20,8 +20,20 @@ function parse(str) {
 		return null;
 	}
 
-	var object = match[1];
-	var member = match[2];
+	var callee;
+	if (match[1]) {
+		callee = {
+			type: 'MemberExpression',
+			object: match[1],
+			member: match[2]
+		};
+	} else {
+		callee = {
+			type: 'Identifier',
+			name: match[2]
+		};
+	}
+
 	var args = match[4] || '';
 	args = args.split(',');
 	if (match[3]) {
@@ -45,21 +57,27 @@ function parse(str) {
 	});
 
 	return {
-		object: object,
-		member: member,
+		callee: callee,
 		args: trimmed
 	};
 }
 
 function generate(parsed) {
-	return [
-		parsed.object,
-		'.',
-		parsed.member,
+	var callee;
+	if (parsed.callee.type === 'MemberExpression') {
+		callee = [
+			parsed.callee.object,
+			'.',
+			parsed.callee.member
+		];
+	} else {
+		callee = [parsed.callee.name];
+	}
+	return callee.concat([
 		'(',
 		parsed.args.map(function (arg) {
 			return arg.optional ? '[' + arg.name + ']' : arg.name;
 		}).join(', '),
 		')'
-	].join('');
+	]).join('');
 }

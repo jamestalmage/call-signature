@@ -3,8 +3,11 @@ import support from './';
 
 test('parse - handles spaces', t => {
 	const expected = {
-		object: 't',
-		member: 'equal',
+		callee: {
+			type: 'MemberExpression',
+			object: 't',
+			member: 'equal'
+		},
 		args: [
 			{
 				name: 'actual',
@@ -33,10 +36,36 @@ test('parse - handles spaces', t => {
     );
 });
 
+test('parse - when callee is an Identifier', t => {
+	const expected = {
+		callee: {
+			type: 'Identifier',
+			name: 'assert'
+		},
+		args: [
+			{
+				name: 'value',
+				optional: false
+			},
+			{
+				name: 'message',
+				optional: true
+			}
+		]
+	};
+	t.same(support.parse('assert(value,[message])'), expected, 'no spaces');
+	t.same(support.parse('assert(value, [message])'), expected, 'standard spacing');
+	t.same(support.parse('  assert  (  value  ,  [  message  ]  )  '), expected, 'lots of spaces');
+	t.end();
+});
+
 test('parse - handles no args', t => {
 	const expected = {
-		object: 'a',
-		member: 'fail',
+		callee: {
+			type: 'MemberExpression',
+			object: 'a',
+			member: 'fail'
+		},
 		args: []
 	};
 	t.deepEqual(support.parse('a.fail()'), expected, 'no spaces');
@@ -45,8 +74,11 @@ test('parse - handles no args', t => {
 
 test('parse - handles only optional args', t => {
 	const expected1 = {
-		object: 'assert',
-		member: 'baz',
+		callee: {
+			type: 'MemberExpression',
+			object: 'assert',
+			member: 'baz'
+		},
 		args: [
 			{
 				name: 'foo',
@@ -56,8 +88,11 @@ test('parse - handles only optional args', t => {
 	};
 
 	const expected2 = {
-		object: 'assert',
-		member: 'baz',
+		callee: {
+			type: 'MemberExpression',
+			object: 'assert',
+			member: 'baz'
+		},
 		args: [
 			{
 				name: 'foo',
@@ -84,10 +119,13 @@ test('parse - handles only optional args', t => {
     );
 });
 
-test('generate', t => {
+test('generate - MemberExpression callee', t => {
 	const parsed = {
-		object: 't',
-		member: 'equal',
+		callee: {
+			type: 'MemberExpression',
+			object: 't',
+			member: 'equal'
+		},
 		args: [
 			{
 				name: 'actual',
@@ -107,8 +145,31 @@ test('generate', t => {
 	t.is(support.generate(parsed), 't.equal(actual, expected, [message])');
 });
 
+test('generate - Identifier callee', t => {
+	const parsed = {
+		callee: {
+			type: 'Identifier',
+			name: 'assert'
+		},
+		args: [
+			{
+				name: 'value',
+				optional: false
+			},
+			{
+				name: 'message',
+				optional: true
+			}
+		]
+	};
+
+	t.is(support.generate(parsed), 'assert(value, [message])');
+	t.end();
+});
+
 test('parse->generate round trip', t => {
 	[
+		'assert(value, [message])',
 		't.ok(value, [message])',
 		't.notOk(value, [message])',
 		't.true(value, [message])',
